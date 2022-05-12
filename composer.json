@@ -1,6 +1,7 @@
 {
     "require": {
         "symfony/dom-crawler": "^5.4",
-        "symfony/css-selector": "^5.4"
+        "symfony/css-selector": "^5.4",
+        "nesk/puphpeteer": "^2.0"
     }
 }

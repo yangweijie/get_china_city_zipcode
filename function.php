@@ -11,29 +11,31 @@ function get_zipcode_from_city($pcode, $cname){
         '310000'=>'defaultQuery?shengji='.urlencode(to_gbk('上海市（沪）')).'&diji='.urlencode(to_gbk('上海市')).'&xianji=',
         '500000'=>'defaultQuery?shengji='.urlencode(to_gbk('重庆市（渝）')).'&diji='.urlencode(to_gbk('重庆市')).'&xianji=',
     ];
-    $host    = 'http://xzqh.mca.gov.cn/';
-    $url     = "{$host}{$urls[$pcode]}".urlencode(to_gbk($cname));
-    // ptrace($url);
-    // return $url;
-    $content = Http::post($url);
-    if($content){
-        $content = iconv('gbk', 'utf-8', $content);
-        ptrace($content);
-        $crawler  = new \Symfony\Component\DomCrawler\Crawler($content);
-        $result   = [];
-        try {
-            $ele = $crawler->filter('.info_table');
-            ptrace($ele);
-            ptrace($ele->html());
-            return $ele->html();
-        } catch (\Exception $e) {
-            ptrace($e->getMessage().PHP_EOL.$e->getTraceAsString());
-            ptrace("获取 pcode:{$pcode}, 市:{$cname} 的邮编失败");
-            return '';
-        }
-    }else{
-        return '';
+    $host      = 'http://xzqh.mca.gov.cn/';
+    $url       = "{$host}{$urls[$pcode]}".urlencode(to_gbk($cname));
+    $puppeteer = new \Nesk\Puphpeteer\Puppeteer([
+        'executable_path'=>'/usr/local/bin/node', // 按实际的写 如果是win  写node.exe
+    ]);
+    $browser = $puppeteer->launch([
+        'args'=>['--no-sandbox', '--disable-setuid-sandbox']
+    ]);
+    $zipcode = '';
+    try {
+        $page = $browser->newPage();
+        $page->goto($url);
+$js =  <<<JS
+var ret = '';
+ret = $('.info_table tr:eq(1) td:eq(6)').text();
+return ret;
+JS;
+        $verifyFunction = \Nesk\Rialto\Data\JsFunction::createWithBody($js);
+        $zipcode = $page->evaluate($verifyFunction);
+    } catch (\Nesk\Rialto\Exceptions\Node\Exception $e) {
+        ptrace("获取 省编码:{$pcode} 市名称:{$cname} 的邮编失败");
+        ptrace($e->getMessage().PHP_EOL.$e->getTraceAsString());
     }
+    $browser->close();
+    return $zipcode;
 }
 
 function ptrace($msg){

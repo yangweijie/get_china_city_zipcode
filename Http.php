@@ -174,7 +174,7 @@ class Http
     }
 
     public static function trace($msg){
-        $file = 'http.log';
+        $file = './http.log';
         if(!is_string($msg)){
             $msg = var_export($msg, true);
         }
