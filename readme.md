@@ -28,7 +28,10 @@ composer install 后执行  `npm install @nesk/puphpeteer `
 
 
 直辖市编码
+
+```
 '110000', // 北京
 '120000', // 天津
 '310000', // 上海
 '500000', // 重庆
+```
