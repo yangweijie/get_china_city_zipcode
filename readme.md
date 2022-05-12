@@ -35,3 +35,9 @@ composer install 后执行  `npm install @nesk/puphpeteer `
 '310000', // 上海
 '500000', // 重庆
 ```
+
+## 执行
+
+`cd dir && php index.php`
+
+`echo get_zipcode_from_city(110000, '东城区');`
